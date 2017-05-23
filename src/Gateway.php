@@ -3,6 +3,7 @@
 namespace Omnipay\Mpesa;
 
 use Omnipay\Common\AbstractGateway;
+use Omnipay\Mpesa\Message\CompleteResponse;
 
 /**
  * Mpesa Gateway
@@ -48,6 +49,16 @@ class Gateway extends AbstractGateway
     public function purchase(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\Mpesa\Message\PurchaseRequest', $parameters);
+    }
+
+    public function complete(array $parameters = array())
+    {
+        return new CompleteResponse($parameters, $this->getSecretKey());
+    }
+
+    public function query(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\PayGate\Message\QueryRequest', $parameters);
     }
 
 }

@@ -65,10 +65,18 @@ class PurchaseRequest extends AbstractRequest
     {
         return $this->getParameter('secretKey');
     }
-
     public function setSecretKey($value)
     {
         return $this->setParameter('secretKey', $value);
+    }
+
+    public function getMerchantId()
+    {
+        return $this->getParameter('merchantId');
+    }
+    public function setMerchantId($value)
+    {
+        return $this->setParameter('merchantId', $value);
     }
 
 
@@ -82,14 +90,15 @@ class PurchaseRequest extends AbstractRequest
             'userName'
         );
 
+        $timestamp = date("Ymdhis");
 
         $data = [
             "ProcessCheckout" => [
                 "ProcessCheckoutRequest" => [
                     "checkoutHeader" => [
-                        "BusinessShortCode" => "898998",
-                        "Password" => "ODk4OTk4NWU4ODQ4OThkYTI4MDQ3MTUxZDBlNTZmOGRjNjI5Mjc3MzYwM2QwZDZhYWJiZGQ2MmExMWVmNzIxZDE1NDJkODIwMTYwMjE2MTY1NjI3",
-                        "Timestamp" => "20160912092847"
+                        "BusinessShortCode" => $this->getMerchantId(),
+                        "Password" => $this->generateSignature($timestamp),
+                        "Timestamp" => $timestamp
                     ],
                     "checkoutTransaction" => [
                         "SourceApp" => "olx-laduma",
@@ -115,13 +124,9 @@ class PurchaseRequest extends AbstractRequest
         return $data;
     }
 
-    public function generateSignature($data)
+    public function generateSignature($timestamp)
     {
-        $checksum = "";
-        foreach ($data as $dKey => $dValue) {
-            $checksum .= $dValue;
-        }
-        return md5($checksum . $this->getSecretKey());
+        return base64_encode($this->getMerchantId() . $this->getSecretKey() . $timestamp);
     }
 
     public function sendData($data)
@@ -134,6 +139,6 @@ class PurchaseRequest extends AbstractRequest
 
     public function getEndpoint()
     {
-        return null;
+        return '{ ENTER ENDPOINT HERE !!!!! }';
     }
 }
