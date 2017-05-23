@@ -2,6 +2,7 @@
 namespace Omnipay\Mpesa\Message;
 
 use Omnipay\Common\Message\AbstractRequest;
+use GuzzleHttp\Client;
 
 /**
  * Mpesa Purchase Request
@@ -81,14 +82,35 @@ class PurchaseRequest extends AbstractRequest
             'userName'
         );
 
-        $data = [];
-        $data['reference'] = $this->getReference();
-        $data['amount'] = $this->getAmount();
-        $data['userEmail'] = $this->getUserEmail();
-        $data['userId'] = $this->getUserId();
-        $data['userName'] = $this->getUserName();
-        $data['userPhone'] = $this->getUserPhone();
-        $data['checksum'] = $this->generateSignature($data);
+
+        $data = [
+            "ProcessCheckout" => [
+                "ProcessCheckoutRequest" => [
+                    "checkoutHeader" => [
+                        "BusinessShortCode" => "898998",
+                        "Password" => "ODk4OTk4NWU4ODQ4OThkYTI4MDQ3MTUxZDBlNTZmOGRjNjI5Mjc3MzYwM2QwZDZhYWJiZGQ2MmExMWVmNzIxZDE1NDJkODIwMTYwMjE2MTY1NjI3",
+                        "Timestamp" => "20160912092847"
+                    ],
+                    "checkoutTransaction" => [
+                        "SourceApp" => "olx-laduma",
+                        "TransactionType" => "CustomerPayBillOnline",
+                        "MerchantRequestID" => $this->getReference(),
+                        "Amount" => $this->getAmount(),
+                        "PhoneNumber" => $this->getUserPhone(),
+                        "CallBackURL" => $this->getNotifyUrl(),
+                        "Parameter" => [
+                            "ReferenceItem" => [
+                                [
+                                    "Key" => "champ_lead",
+                                    "Value" => "1"
+                                ]
+                            ]
+                        ]
+                    ],
+                    "TransactionDesc" => "OLX Payment"
+			    ]
+            ]
+		];
 
         return $data;
     }
@@ -104,7 +126,9 @@ class PurchaseRequest extends AbstractRequest
 
     public function sendData($data)
     {
-        $this->response = new PurchaseResponse($this, http_build_query($data), $this->getTestMode());
+        $client = new Client();
+        $httpResponse = $client->post($this->getEndpoint(), ['json' => $data]);
+        $this->response = new PurchaseResponse($this, $httpResponse->getBody()->getContents(), $this->getTestMode());
         return $this->response;
     }
 

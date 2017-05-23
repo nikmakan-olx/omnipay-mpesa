@@ -5,7 +5,7 @@ namespace Omnipay\Mpesa;
 use Omnipay\Common\AbstractGateway;
 
 /**
- * OlxBranch Gateway
+ * Mpesa Gateway
  *
  * @link TODO
  */
@@ -20,6 +20,7 @@ class Gateway extends AbstractGateway
     {
         return [
             'secretKey' => '',
+            'merchantId' => '',
             'testMode' => false,
         ];
     }
@@ -32,6 +33,16 @@ class Gateway extends AbstractGateway
     public function setSecretKey($value)
     {
         return $this->setParameter('secretKey', $value);
+    }
+
+    public function getMerchantId()
+    {
+        return $this->getParameter('merchantId');
+    }
+
+    public function setMerchantId($value)
+    {
+        return $this->setParameter('merchantId', $value);
     }
 
     public function purchase(array $parameters = array())
